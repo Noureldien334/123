@@ -5,6 +5,7 @@
  */
 package simulation;
 
+import java.util.stream.IntStream;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -12,13 +13,21 @@ import javax.swing.table.DefaultTableModel;
  * @author nour eldein
  */
 public class JASD extends javax.swing.JFrame {
-static int rows1,rows2;
+    
+   
+static int rows1,rows2;static String s5,s6;
+
     /**
      * Creates new form JASD
      */
     DefaultTableModel model,model1;
-    public JASD(int rows,int rows2) {
+    String type,type1;
+    
+    public JASD(int rows,int rows2,String col,String col2) {
+        
         rows1=rows;
+        type=col;
+        type1=col2;
         initComponents();
         model1 =new DefaultTableModel();
          model =new DefaultTableModel();
@@ -27,8 +36,10 @@ static int rows1,rows2;
         model.setRowCount(rows);
         
         model1.addColumn("Lead Time");
-        model.addColumn("Demand");
         
+        model.addColumn("Demand");
+        model.addColumn(col);
+        model1.addColumn(col2);
         Table1.setModel(model);
         Table2.setModel(model1);
         
@@ -60,6 +71,7 @@ static int rows1,rows2;
             }
         });
 
+        Table1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         Table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -71,8 +83,10 @@ static int rows1,rows2;
                 "Deamand"
             }
         ));
+        Table1.setShowGrid(true);
         jScrollPane2.setViewportView(Table1);
 
+        Table2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         Table2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -84,6 +98,7 @@ static int rows1,rows2;
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        Table2.setShowGrid(true);
         jScrollPane1.setViewportView(Table2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -93,8 +108,9 @@ static int rows1,rows2;
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(78, 78, 78)
+                        .addGap(19, 19, 19)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(46, 46, 46)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(254, 254, 254)
@@ -118,29 +134,67 @@ static int rows1,rows2;
 
     private void SubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubmitActionPerformed
         // TODO add your handling code here:
-        int i;
+        int i,table1=Table1.getRowCount(),table2=Table2.getRowCount();
         Object[] rowData = new Object[Table1.getRowCount()];
+        
          Object[] rowData2 = new Object[Table2.getRowCount()];
+         Object[] coulmnData=new Object[Table1.getRowCount()];
+         Object[] coulmnData2=new Object[Table2.getRowCount()];
+        double prob[]=new double[Table1.getRowCount()];
+         double prob1[]=new double [Table2.getRowCount()];
         if (Table1.isEditing())
     Table1.getCellEditor().stopCellEditing();
         if (Table2.isEditing())
     Table2.getCellEditor().stopCellEditing();
+        
 for (i =0; i <Table1.getRowCount() || i<Table2.getRowCount(); i++) {
     {
         if(i<Table1.getRowCount())
         {rowData[i] = Table1.getValueAt(i,0);
-    System.out.println(rowData[i]);}
+      
+        coulmnData[i] =Table1.getValueAt(i, 1);
+        prob[i]=(double)Double.parseDouble(coulmnData[i].toString());
+          
+        
+        }
+        
         if(i<Table2.getRowCount()){
     rowData2[i] = Table2.getValueAt(i,0);
-    System.out.println(rowData2[i]);}}
+     coulmnData2[i] =Table2.getValueAt(i, 1);
+     
+    }
+        
+    }
     
-    
+     
+  
        
 
 
+
+
+         }
+
+if(type=="Frequency"){
+     
+   
+int sum = 0;
+       
+    for (i =0; i <Table1.getRowCount() ; i++) 
+    {
+        sum+=Integer.parseInt(coulmnData[i].toString());
+        
+  
+    }
+    prob=Simulation.Frequency_to_probabilty(Table1.getRowCount(), prob, sum);
+    Simulation.Probability_to_cumulative(Table1.getRowCount(),prob);
+   
+    
+  
+        
+    
+     
 }
-       
-
     }//GEN-LAST:event_SubmitActionPerformed
 
     /**
@@ -174,7 +228,7 @@ for (i =0; i <Table1.getRowCount() || i<Table2.getRowCount(); i++) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
              
-                new JASD(rows1,rows2).setVisible(true);
+                new JASD(rows1,rows2,s5,s6).setVisible(true);
             }
         });
     }
