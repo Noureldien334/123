@@ -5,6 +5,9 @@
  */
 package simulation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
 import java.util.stream.IntStream;
 import javax.swing.table.DefaultTableModel;
 
@@ -13,40 +16,34 @@ import javax.swing.table.DefaultTableModel;
  * @author nour eldein
  */
 public class JASD extends javax.swing.JFrame {
-    
-   
-static int rows1,rows2;static String s5,s6;
+
+    static int rows1, rows2;
+    static String s5, s6;
 
     /**
      * Creates new form JASD
      */
-    DefaultTableModel model,model1;
-    String type,type1;
-    
-    public JASD(int rows,int rows2,String col,String col2) {
-        
-        rows1=rows;
-        type=col;
-        type1=col2;
+    DefaultTableModel model, model1;
+    String type, type1;
+
+    public JASD(int rows, int rows2, String col, String col2) {
+
+        rows1 = rows;
+        type = col;
+        type1 = col2;
         initComponents();
-        model1 =new DefaultTableModel();
-         model =new DefaultTableModel();
-         model1.setRowCount(rows2);
-        Home1 obj=new Home1();
+        model1 = new DefaultTableModel();
+        model = new DefaultTableModel();
+        model1.setRowCount(rows2);
+        Home1 obj = new Home1();
         model.setRowCount(rows);
-        
         model1.addColumn("Lead Time");
-        
         model.addColumn("Demand");
         model.addColumn(col);
         model1.addColumn(col2);
         Table1.setModel(model);
         Table2.setModel(model1);
-        
-       
 
-        
-        
     }
 
     /**
@@ -134,69 +131,115 @@ static int rows1,rows2;static String s5,s6;
 
     private void SubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubmitActionPerformed
         // TODO add your handling code here:
-        int i,table1=Table1.getRowCount(),table2=Table2.getRowCount();
+        
+        int i, table1 = Table1.getRowCount(), table2 = Table2.getRowCount();
+        
         Object[] rowData = new Object[Table1.getRowCount()];
+        Object[] rowData2 = new Object[Table2.getRowCount()];
+        Object[] coulmnData = new Object[Table1.getRowCount()];
+        Object[] coulmnData2 = new Object[Table2.getRowCount()];
+        double prob[] = new double[Table1.getRowCount()];
+        double probb[]=new double[Table1.getRowCount()];
+        double prob1[] = new double[Table2.getRowCount()];
+        double probb1[]=new double[Table2.getRowCount()];
+        String Demand[]=new String[Table1.getRowCount()];
+        double cumulative[] = new double[Table1.getRowCount()];
+        double cumulative1[]=new double[Table2.getRowCount()];
+        double intervals[][]=new double[Table1.getRowCount()][2];
+        double intervals1[][]=new double[Table2.getRowCount()][2];
         
-         Object[] rowData2 = new Object[Table2.getRowCount()];
-         Object[] coulmnData=new Object[Table1.getRowCount()];
-         Object[] coulmnData2=new Object[Table2.getRowCount()];
-        double prob[]=new double[Table1.getRowCount()];
-         double prob1[]=new double [Table2.getRowCount()];
-        if (Table1.isEditing())
-    Table1.getCellEditor().stopCellEditing();
-        if (Table2.isEditing())
-    Table2.getCellEditor().stopCellEditing();
-        
-for (i =0; i <Table1.getRowCount() || i<Table2.getRowCount(); i++) {
-    {
-        if(i<Table1.getRowCount())
-        {rowData[i] = Table1.getValueAt(i,0);
-      
-        coulmnData[i] =Table1.getValueAt(i, 1);
-        prob[i]=(double)Double.parseDouble(coulmnData[i].toString());
-          
-        
+        if (Table1.isEditing()) {
+            Table1.getCellEditor().stopCellEditing();
+           
+        }
+        if (Table2.isEditing()) {
+            Table2.getCellEditor().stopCellEditing();
+        }
+
+        for (i = 0; i < Table1.getRowCount() || i < Table2.getRowCount(); i++) {
+            {
+                if (i < Table1.getRowCount()) {
+                    rowData[i] = Table1.getValueAt(i, 0);
+                    Demand[i]=rowData[i].toString();
+                    
+                    coulmnData[i] = Table1.getValueAt(i, 1);
+                    prob[i] = (double) Double.parseDouble(coulmnData[i].toString());
+                    probb[i]=prob[i];
+                    
+                }
+
+                if (i < Table2.getRowCount()) {
+                    rowData2[i] = Table2.getValueAt(i, 0);
+                    coulmnData2[i] = Table2.getValueAt(i, 1);
+                    prob1[i] = (double) Double.parseDouble(coulmnData2[i].toString());
+                    probb1[i]=prob1[i];
+
+                }
+
+            }
+
+        }
+    
+     
+//////////////////////////////////////////////////////////Frequency Part////////////////////////////////////////////////
+        if (type == "Frequency") {
+
+            int sum = 0;
+
+            for (i = 0; i < Table1.getRowCount(); i++) {
+                sum += Integer.parseInt(coulmnData[i].toString());
+
+            }
+            prob = Simulation.Frequency_to_probabilty(Table1.getRowCount(), prob, sum);
+            cumulative = Simulation.Probability_to_cumulative(Table1.getRowCount(), prob);
+            intervals=Simulation.get_intervals(cumulative, Table1.getRowCount());
+
+        }
+        else if  (type=="Probability")
+        {
+           
+            cumulative = Simulation.Probability_to_cumulative(Table1.getRowCount(), probb);
+            intervals=Simulation.get_intervals(cumulative, Table1.getRowCount());
+         
+        }
+        if (type1 == "Frequency") {
+
+            int sum = 0;
+
+            for (i = 0; i < Table2.getRowCount(); i++) {
+                sum += Integer.parseInt(coulmnData2[i].toString());
+
+            }
+            prob1=Simulation.Frequency_to_probabilty(Table2.getRowCount(), prob1, sum);
+            cumulative1= Simulation.Probability_to_cumulative(Table2.getRowCount(), prob1);
+           // Simulation.get_intervals(cumulative1, Table2.getRowCount());
+            
+        }
+        else if (type1=="Probability")
+        {
+            cumulative1= Simulation.Probability_to_cumulative(Table2.getRowCount(), probb1);
+             //Simulation.get_intervals(cumulative1, Table2.getRowCount());
+            
         }
         
-        if(i<Table2.getRowCount()){
-    rowData2[i] = Table2.getValueAt(i,0);
-     coulmnData2[i] =Table2.getValueAt(i, 1);
-     
-    }
-        
-    }
-    
-     
-  
+        Tables obj=new Tables(table1,table2,type,type1,Demand,probb,cumulative,intervals);
+        obj.setVisible(true);
        
 
 
 
+       // Tables obj=new Tables(table1,table2);
+       //obj.setVisible(true);
+////////////////
 
-         }
-
-if(type=="Frequency"){
-     
-   
-int sum = 0;
-       
-    for (i =0; i <Table1.getRowCount() ; i++) 
-    {
-        sum+=Integer.parseInt(coulmnData[i].toString());
-        
-  
-    }
-    prob=Simulation.Frequency_to_probabilty(Table1.getRowCount(), prob, sum);
-    Simulation.Probability_to_cumulative(Table1.getRowCount(),prob);
-   
-    
-  
-        
-    
-     
-}
     }//GEN-LAST:event_SubmitActionPerformed
-
+JASD()
+{
+    
+    
+    
+    
+}
     /**
      * @param args the command line arguments
      */
@@ -227,8 +270,8 @@ int sum = 0;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             
-                new JASD(rows1,rows2,s5,s6).setVisible(true);
+
+                new JASD(rows1, rows2, s5, s6).setVisible(true);
             }
         });
     }
